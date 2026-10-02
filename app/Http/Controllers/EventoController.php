@@ -19,8 +19,11 @@ class EventoController extends Controller
     public function show($id)
     {
         $evento = Evento::find($id);
+        
+        $perguntas = Pergunta::where('evento_id', $id)
+        ->latest()
+        ->paginate(10);
 
-        $perguntas = Pergunta::all();
 
         return view('eventos.show', compact('evento', 'perguntas'));
     }
