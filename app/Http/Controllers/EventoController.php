@@ -8,7 +8,7 @@ use App\Models\Pergunta;
 use App\Http\Requests\StorePerguntaRequest;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
-use PhpParser\Builder\Use_;
+
 
 class EventoController extends Controller
 {
@@ -24,7 +24,11 @@ class EventoController extends Controller
     {
         $evento = Evento::find($id);
 
-        $perguntas = Pergunta::all();
+        $perguntas = Pergunta::where('evento_id', $id)
+            ->withCount('votos')
+                ->with('votos')
+                    ->orderByDesc('votos_count')
+                        ->get();
 
         return view('eventos.show', compact('evento', 'perguntas'));
     }
@@ -63,4 +67,10 @@ class EventoController extends Controller
         return back()->with('status', 'Inscrição atualizada com sucesso!');
     }
 
+    public function votar(Pergunta $pergunta)
+    {
+    $pergunta->votos()->toggle(Auth::id());
+
+    return back()->with('status', 'Voto atualizado com sucesso!');
+    }
 }

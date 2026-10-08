@@ -3,7 +3,7 @@
 @section('title', $evento->titulo . ' — FalaQ')
 
 @section('content')
-<div class="row">[
+<div class="row">
     <div class="flex items-center gap-4 my-4">
         <span class="text-sm font-semibold bg-blue-100 text-blue-800 px-3 py-1 rounded-full">
             👥 {{ $evento->participantes->count() }} participante(s)
@@ -51,13 +51,41 @@
 
         @forelse($perguntas as $pergunta)
             <div class="card mb-3 shadow-sm border-start border-4 border-primary">
-                <div class="card-body">
-                    <p class="fs-5 mb-2 text-white">{{ $pergunta->texto }}</p>
-                    <div class="d-flex justify-content-between align-items-center text-secondary small">
-                        <span>Status: <span class="badge bg-success">{{ $pergunta->status }}</span></span>
-                        <span>{{ $pergunta->created_at->format('d/m/Y H:i') }}</span>
-                    </div>
-                </div>
+            <div class="card-body">
+    <p class="fs-5 mb-2 text-white">{{ $pergunta->texto }}</p>
+
+    <div class="d-flex justify-content-between align-items-center text-secondary small">
+        <span>
+            Status:
+            <span class="badge bg-success">{{ $pergunta->status }}</span>
+        </span>
+
+        <span>{{ $pergunta->created_at->format('d/m/Y H:i') }}</span>
+    </div>
+
+    <div class="mt-3 d-flex align-items-center gap-2">
+        <span class="text-secondary">
+            👍 {{ $pergunta->votos_count }} voto(s)
+        </span>
+
+        @auth
+            @php
+                $jaVotou = $pergunta->votos->contains(auth()->id());
+            @endphp
+
+            <form action="{{ route('perguntas.votar', $pergunta) }}" method="POST">
+                @csrf
+
+                <button
+                    type="submit"
+                    class="px-3 py-1 rounded-md text-sm font-medium {{ $jaVotou ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-gray-200 text-gray-800 hover:bg-gray-300' }}"
+                >
+                    {{ $jaVotou ? '👍 Votado' : '👍 Upvote' }}
+                </button>
+            </form>
+        @endauth
+    </div>
+</div>
             </div>
         @empty
             <div class="alert alert-dark text-center p-4">
